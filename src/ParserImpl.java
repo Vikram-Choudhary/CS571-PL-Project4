@@ -25,9 +25,10 @@ public class ParserImpl extends Parser {
     private Expr parseT() throws Exception {
         Expr left = parseF();
         if (peek(TokenType.PLUS, 0) || peek(TokenType.MINUS, 0)) {
+            Token op = consume(peek(TokenType.PLUS, 0) ? TokenType.PLUS : TokenType.MINUS);
+
             Expr right = parseT();
 
-            Token op = consume(peek(TokenType.PLUS, 0) ? TokenType.PLUS : TokenType.MINUS);
             return (op.ty == TokenType.PLUS) ? new PlusExpr(left, right) : new MinusExpr(left, right);
         }
         return left;
@@ -36,9 +37,10 @@ public class ParserImpl extends Parser {
     private Expr parseF() throws Exception {
         Expr left = parseLit();
         if (peek(TokenType.TIMES, 0) || peek(TokenType.DIV, 0)) {
+            Token op = consume(peek(TokenType.TIMES, 0) ? TokenType.TIMES : TokenType.DIV);
+
             Expr right = parseF();
 
-            Token op = consume(peek(TokenType.TIMES, 0) ? TokenType.TIMES : TokenType.DIV);
             return (op.ty == TokenType.TIMES) ? new TimesExpr(left, right) : new DivExpr(left, right);
         }
         return left;
@@ -47,12 +49,10 @@ public class ParserImpl extends Parser {
     private Expr parseLit() throws Exception {
         if (peek(TokenType.NUM, 0)) {
             Token num = consume(TokenType.NUM);
-
             return new FloatExpr(Float.parseFloat(num.lexeme));
         } else if (peek(TokenType.LPAREN, 0)) {
-            Expr expr = parseT();
-
             consume(TokenType.LPAREN);
+            Expr expr = parseT();
             consume(TokenType.RPAREN);
             return expr;
         } else {
